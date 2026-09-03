@@ -4,7 +4,8 @@
   "description": "CRUD de servicios de programacion",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index",
+    "dev": "node --watch index"
   },
   "keywords": ["middlewares", "endpoints", "controllers"],
   "author": "Arias Emilse",
