@@ -7,5 +7,3 @@ const server = new Server()
 
 //escuchar el puerto
 server.listen()
-
-console.log('Segundo mensaje del backend')
