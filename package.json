@@ -7,7 +7,11 @@
     "start": "node index",
     "dev": "node --watch index"
   },
-  "keywords": ["middlewares", "endpoints", "controllers"],
+  "keywords": [
+    "middlewares",
+    "endpoints",
+    "controllers"
+  ],
   "author": "Arias Emilse",
   "license": "ISC",
   "devEngines": {
@@ -17,5 +21,10 @@
       "onFail": "download"
     }
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "morgan": "^1.12.0"
+  }
 }
