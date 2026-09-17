@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+    borrarServicio,
   crearServicio,
   listarServicios,
   prueba,
@@ -13,6 +14,6 @@ const router = Router();
 // get, post, put/patch, delete
 // router.route("/test").get(prueba);
 router.route("/").post(crearServicio).get(listarServicios);
-router.route('/:id').get(servicioBuscado)
+router.route('/:id').get(servicioBuscado).delete(borrarServicio)
 
 export default router;
