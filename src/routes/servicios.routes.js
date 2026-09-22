@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
-    borrarServicio,
+  borrarServicio,
   crearServicio,
+  editarServicio,
   listarServicios,
   prueba,
   servicioBuscado,
@@ -14,6 +15,10 @@ const router = Router();
 // get, post, put/patch, delete
 // router.route("/test").get(prueba);
 router.route("/").post(crearServicio).get(listarServicios);
-router.route('/:id').get(servicioBuscado).delete(borrarServicio)
+router
+  .route("/:id")
+  .get(servicioBuscado)
+  .delete(borrarServicio)
+  .put(editarServicio);
 
 export default router;
