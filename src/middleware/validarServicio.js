@@ -32,6 +32,25 @@ const reglasServicio = [
     .withMessage(
       'La categoría debe ser una de las siguientes opciones: "Desarrollo Web", "Backend & API", "Consultoria"',
     ),
+  body("descripcion")
+    .notEmpty()
+    .withMessage("La descripción es un campo obligatorio")
+    .isString()
+    .withMessage("La descripción debe ser un string")
+    .isLength({
+      min: 10,
+      max: 500,
+    })
+    .withMessage("La descripción debe contener entre 10 y 500 caracteres"),
+  body("imagen")
+    .notEmpty()
+    .withMessage("La imagen es un dato obligatorio")
+    .isString()
+    .withMessage("La imagen debe ser un string")
+    .matches(/^https:\/\/.+\.(jpg|jpeg|png|webp|avif|svg)$/)
+    .withMessage(
+      "La imagen debe ser un url valida, ademas de terminar en una de las siguientes extensiones: jpg|jpeg|png|webp|avif|svg",
+    ),
   resultadoValidacion,
 ];
 

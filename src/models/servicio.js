@@ -26,7 +26,7 @@ const servicioSchema = new Schema(
       requied: true,
       validate: {
         validator: (valor) => {
-          return /\.(jpg|jpeg|png|webp|avif|svg)$/.test(valor);
+          return /^https:\/\/.+\.(jpg|jpeg|png|webp|avif|svg)$/.test(valor);
         },
       },
     },
