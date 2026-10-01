@@ -20,6 +20,6 @@ router
   .route("/:id")
   .get(servicioBuscado)
   .delete(borrarServicio)
-  .put(editarServicio);
+  .put(reglasServicio, editarServicio);
 
 export default router;

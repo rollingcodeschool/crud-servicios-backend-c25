@@ -1,5 +1,6 @@
 import { body } from "express-validator";
 import resultadoValidacion from "./resultadoValidacion.js";
+import Servicio from "../models/servicio.js";
 
 const reglasServicio = [
   body("nombreServicio")
@@ -13,7 +14,24 @@ const reglasServicio = [
       "El nombre del servicio debe contener entre 5 y 100 caracteres.",
     )
     .notEmpty()
-    .withMessage("El nombre del servicio es un dato obligatorio"),
+    .withMessage("El nombre del servicio es un dato obligatorio")
+    .custom(async (valor, { req }) => {
+      const servicioExistente = await Servicio.findOne({
+        nombreServicio: valor,
+      });
+      if (!servicioExistente) {
+        return true;
+      }
+      //   verificamos si estamos editando el servicio
+      if (
+        req.params?.id &&
+        servicioExistente._id.toString() === req.params.id
+      ) {
+        return true;
+      }
+      //   aqui muestro el mensaje de error
+      throw new Error("El servicio ya existe en la base de datos");
+    }),
   body("precio")
     .notEmpty()
     .withMessage("El precio es un dato obligatorio")
