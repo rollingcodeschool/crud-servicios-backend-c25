@@ -1,8 +1,8 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import resultadoValidacion from "./resultadoValidacion.js";
 import Servicio from "../models/servicio.js";
 
-const reglasServicio = [
+export const reglasServicio = [
   body("nombreServicio")
     .isString()
     .withMessage("El nombre del servicio debe ser un string")
@@ -72,4 +72,9 @@ const reglasServicio = [
   resultadoValidacion,
 ];
 
-export default reglasServicio;
+export const validarID = [
+  param("id")
+    .isMongoId()
+    .withMessage("El id enviado no tiene el formato esperado"),
+    resultadoValidacion
+];

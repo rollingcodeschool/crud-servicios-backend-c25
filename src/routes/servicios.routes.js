@@ -7,7 +7,7 @@ import {
   prueba,
   servicioBuscado,
 } from "../controllers/servicios.controllers.js";
-import reglasServicio from "../middleware/validarServicio.js";
+import {reglasServicio, validarID} from "../middleware/validarServicio.js";
 
 const router = Router();
 
@@ -18,8 +18,8 @@ const router = Router();
 router.route("/").post(reglasServicio,crearServicio).get(listarServicios);
 router
   .route("/:id")
-  .get(servicioBuscado)
-  .delete(borrarServicio)
-  .put(reglasServicio, editarServicio);
+  .get(validarID, servicioBuscado)
+  .delete(validarID, borrarServicio)
+  .put([validarID, reglasServicio], editarServicio);
 
 export default router;

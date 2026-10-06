@@ -51,7 +51,6 @@ export const servicioBuscado = async (req, res) => {
 export const borrarServicio = async (req, res) => {
   try {
     const servicioBorrado = await Servicio.findByIdAndDelete(req.params.id);
-    console.log(servicioBorrado);
     if (!servicioBorrado) {
       return res
         .status(404)
