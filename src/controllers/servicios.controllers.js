@@ -22,7 +22,14 @@ export const crearServicio = async (req, res) => {
 
 export const listarServicios = async (req, res) => {
   try {
-    const servicios = await Servicio.find();
+    const {termino} = req.query
+    console.log(termino)
+    const query = {};
+    if(termino){
+      query.nombreServicio = {$regex: termino, $options: "i" }
+    }
+
+    const servicios = await Servicio.find(query)
     res.status(200).json(servicios);
   } catch (error) {
     console.error(error);
