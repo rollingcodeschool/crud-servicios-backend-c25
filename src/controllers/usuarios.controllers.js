@@ -68,3 +68,21 @@ export const registrarUsuario = async (req, res) => {
     res.status(500).json({ mensaje: "Error al registrar un usuario" });
   }
 };
+
+
+export const verificarRegistro = async (req, res)=>{
+    try{
+        const {email, codigo} = req.body
+        //1- buscar al usuario que contiene ese email
+
+        const usuario = await Usuario.findOne({email})
+        if(!usuario){
+            return res.status(400).json({mensaje: "No se encontro ningun usuario con el email enviado."})
+        }
+
+        
+    }catch(error){
+        console.error(error);
+        res.status(500).json({mensaje: "No se pudo verificar la cuenta del usuario"})
+    }
+}
