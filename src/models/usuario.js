@@ -59,16 +59,17 @@ const usuarioSchema = new Schema(
   },
 );
 
-usuarioSchema.pre("save", async function (next) {
+usuarioSchema.pre("save", async function () {
+  console.log('estamos por hashear el password')
   if (!this.isModified("password")) {
-    return next();
+    return ;
   }
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
   } catch (error) {
-    next(error);
+    console.error(error)
+    throw error
   }
 });
 
