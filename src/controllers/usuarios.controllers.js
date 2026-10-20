@@ -1,5 +1,6 @@
 import Usuario from "../models/usuario.js";
 import transporter from "../utils/mailer.js";
+import bcrypt from "bcryptjs";
 
 export const registrarUsuario = async (req, res) => {
   try {
@@ -156,5 +157,25 @@ export const solicitarNuevoCodigo = async(req, res)=>{
   } catch (error) {
     console.error(error)
     res.status(500).json({mensaje: 'Ocurrio un error al intentar generar un nuevo código de verificación'})
+  }
+}
+
+export const login = async(req, res)=>{
+  try{
+    const {email, password} = req.body
+    //1- verficar su email
+    const usuarioBuscado = await Usuario.findOne({email});
+    if(!usuarioBuscado){
+      return res.status(401).json({mensaje: 'credenciales invalidas - validacion de email'})
+    }
+    //2- verifiquemos el password
+    if(!(await bcrypt.compare(password, usuarioBuscado.password))){
+      return res.status(401).json({mensaje: 'credenciales invalidas - validacion de password'})
+    }
+    //3- chequear si su codigo de verificación es valido
+
+  }catch(error){
+    console.error(error)
+    res.status(500).json({mensaje: 'Ocurrio un error al loguear al usuario'})
   }
 }
