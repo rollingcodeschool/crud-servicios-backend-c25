@@ -74,12 +74,30 @@ export const verificarRegistro = async (req, res)=>{
     try{
         const {email, codigo} = req.body
         //1- buscar al usuario que contiene ese email
-
         const usuario = await Usuario.findOne({email})
         if(!usuario){
-            return res.status(400).json({mensaje: "No se encontro ningun usuario con el email enviado."})
+            return res.status(404).json({mensaje: "No se encontro ningun usuario con el email enviado."})
+        }
+        //2- verificar si el usuario no esta activo aún 
+        if(usuario.isVerified){
+          return res.status(400).json({mensaje: "Esta cuenta ya fue verificada"})
+        }
+        //3- verificar si el codigo sigue vigente
+        if( new Date() > usuario.verificationExpires){
+          return res.status(400).json({mensaje: 'El código de verificación a expirado, debes solicitar un código nuevo'})
+        }
+        //4- verificar si el codigo enviado es correcto
+        if(usuario.verificationCode !== codigo){
+         return res.status(400).json({mensaje: "El código enviado es incorrecto"})
         }
 
+        //verificar el codigo del usuario
+        await Usuario.findByIdAndUpdate(usuario._id,{
+          $set:{isVerified: true}, //aqui modificamos esta propiedad del documento
+          $unset:{verificationCode: 1, verificationExpires: 1} //aqui quito estas dos propiedades del documento
+        })
+
+        res.status(200).json({mensaje: 'Cuenta verificada con exito. Ya puedes iniciar sesión'})
         
     }catch(error){
         console.error(error);
