@@ -200,7 +200,7 @@ export const login = async (req, res) => {
       { id: usuarioBuscado._id, rol: usuarioBuscado.rol },
       process.env.JWT_SECRET,
       {
-        expiresIn: "2s",
+        expiresIn: "1hs",
       },
     );
 
@@ -224,7 +224,12 @@ export const login = async (req, res) => {
 
 export const obtenerPerfil = async(req, res)=>{
   try{
-
+    //buscar el perfil del usuario logueado
+    const usuarioBuscado= await Usuario.findById(req.user.id).select("-password -isVerified -createdAt -updatedAt")
+    if(!usuarioBuscado){
+      return res.status(404).json({mensaje: "Usuario no encontrado"})
+    }
+    res.status(200).json(usuarioBuscado)
   }catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Ocurrio un error al obtener el perfil del usuario" });
