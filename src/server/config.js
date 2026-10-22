@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { dirname } from "path"
 import { fileURLToPath } from "url";
 import '../database/db.js'
+import cookieParser from "cookie-parser";
 
 class Server {
   constructor() {
@@ -20,6 +21,7 @@ class Server {
     this.app.use(morgan("dev")); //muestra por terminal informacion de la comunicacion HTTP
     this.app.use(express.json()); //podemos leer los datos en formato JSON que llegan en el BODY del request
     //configurar un archivo estatico
+    this.app.use(cookieParser())
     const __dirname = dirname(fileURLToPath(import.meta.url))
     // console.log(__dirname + "/../../public")
     this.app.use(express.static(__dirname + "/../../public")) //configuramos un archivo estatico

@@ -221,3 +221,12 @@ export const login = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al loguear al usuario" });
   }
 };
+
+export const obtenerPerfil = async(req, res)=>{
+  try{
+
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Ocurrio un error al obtener el perfil del usuario" });
+  }
+}
