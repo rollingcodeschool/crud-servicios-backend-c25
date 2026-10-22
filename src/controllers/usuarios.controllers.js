@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import Usuario from "../models/usuario.js";
 import transporter from "../utils/mailer.js";
 import bcrypt from "bcryptjs";
@@ -57,66 +58,77 @@ export const registrarUsuario = async (req, res) => {
 
     // 5 - enviar respuesta
     res.status(201).json({
-        mensaje: 'Usuario registrado con exito. Por favor, revisa tu email para verificar tu cuenta.',
-        usuario:{
-            _id: nuevoUsuario._id,
-            nombre: nuevoUsuario.nombre
-        }
-    })
-
+      mensaje:
+        "Usuario registrado con exito. Por favor, revisa tu email para verificar tu cuenta.",
+      usuario: {
+        _id: nuevoUsuario._id,
+        nombre: nuevoUsuario.nombre,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al registrar un usuario" });
   }
 };
 
-
-export const verificarRegistro = async (req, res)=>{
-    try{
-        const {email, codigo} = req.body
-        //1- buscar al usuario que contiene ese email
-        const usuario = await Usuario.findOne({email})
-        if(!usuario){
-            return res.status(404).json({mensaje: "No se encontro ningun usuario con el email enviado."})
-        }
-        //2- verificar si el usuario no esta activo aún 
-        if(usuario.isVerified){
-          return res.status(400).json({mensaje: "Esta cuenta ya fue verificada"})
-        }
-        //3- verificar si el codigo sigue vigente
-        if( new Date() > usuario.verificationExpires){
-          return res.status(400).json({mensaje: 'El código de verificación a expirado, debes solicitar un código nuevo'})
-        }
-        //4- verificar si el codigo enviado es correcto
-        if(usuario.verificationCode !== codigo){
-         return res.status(400).json({mensaje: "El código enviado es incorrecto"})
-        }
-
-        //verificar el codigo del usuario
-        await Usuario.findByIdAndUpdate(usuario._id,{
-          $set:{isVerified: true}, //aqui modificamos esta propiedad del documento
-          $unset:{verificationCode: 1, verificationExpires: 1} //aqui quito estas dos propiedades del documento
-        })
-
-        res.status(200).json({mensaje: 'Cuenta verificada con exito. Ya puedes iniciar sesión'})
-        
-    }catch(error){
-        console.error(error);
-        res.status(500).json({mensaje: "No se pudo verificar la cuenta del usuario"})
-    }
-}
-
-export const solicitarNuevoCodigo = async(req, res)=>{
+export const verificarRegistro = async (req, res) => {
   try {
-    const {email} = req.body;
+    const { email, codigo } = req.body;
+    //1- buscar al usuario que contiene ese email
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({
+        mensaje: "No se encontro ningun usuario con el email enviado.",
+      });
+    }
+    //2- verificar si el usuario no esta activo aún
+    if (usuario.isVerified) {
+      return res.status(400).json({ mensaje: "Esta cuenta ya fue verificada" });
+    }
+    //3- verificar si el codigo sigue vigente
+    if (new Date() > usuario.verificationExpires) {
+      return res.status(400).json({
+        mensaje:
+          "El código de verificación a expirado, debes solicitar un código nuevo",
+      });
+    }
+    //4- verificar si el codigo enviado es correcto
+    if (usuario.verificationCode !== codigo) {
+      return res
+        .status(400)
+        .json({ mensaje: "El código enviado es incorrecto" });
+    }
+
+    //verificar el codigo del usuario
+    await Usuario.findByIdAndUpdate(usuario._id, {
+      $set: { isVerified: true }, //aqui modificamos esta propiedad del documento
+      $unset: { verificationCode: 1, verificationExpires: 1 }, //aqui quito estas dos propiedades del documento
+    });
+
+    res.status(200).json({
+      mensaje: "Cuenta verificada con exito. Ya puedes iniciar sesión",
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ mensaje: "No se pudo verificar la cuenta del usuario" });
+  }
+};
+
+export const solicitarNuevoCodigo = async (req, res) => {
+  try {
+    const { email } = req.body;
     //1- validar si existe este email
-    const usuarioBuscado = await Usuario.findOne({email});
-    if(!usuarioBuscado){
-      return res.status(404).json({mensaje: 'No se encontró un usuario con este email'})
+    const usuarioBuscado = await Usuario.findOne({ email });
+    if (!usuarioBuscado) {
+      return res
+        .status(404)
+        .json({ mensaje: "No se encontró un usuario con este email" });
     }
     //2- validar que el código aún no este verificado
-    if(usuarioBuscado.isVerified){
-      return res.status(400).json({mensaje: 'Esta cuenta ya fue verificada'})
+    if (usuarioBuscado.isVerified) {
+      return res.status(400).json({ mensaje: "Esta cuenta ya fue verificada" });
     }
 
     //3- aqui creamos el nuevo código de verificación y la fecha de exp.
@@ -126,13 +138,13 @@ export const solicitarNuevoCodigo = async(req, res)=>{
     const tiempoExpiracion = new Date(Date.now() + 15 * 60 * 1000);
 
     //actualizar el usuario con su nuevo codigo y fecha de expiración
-    await Usuario.findByIdAndUpdate(usuarioBuscado._id,{
+    await Usuario.findByIdAndUpdate(usuarioBuscado._id, {
       verificationCode: codigoVerificacion,
-      verificationExpires: tiempoExpiracion
-    })
+      verificationExpires: tiempoExpiracion,
+    });
 
     // 4- volver a enviar el email
-     await transporter.sendMail({
+    await transporter.sendMail({
       from: '"Crud Servicios" <no-reply@crud-servicios.com>',
       to: usuarioBuscado.email,
       subject: "🔑 Nuevo código de verificación de cuenta",
@@ -150,32 +162,62 @@ export const solicitarNuevoCodigo = async(req, res)=>{
           </p>
         </div>
       `,
-    })
+    });
 
-    res.status(200).json({mensaje: 'Nuevo código generado y enviado con exito. Revisa tu email'})
-
+    res.status(200).json({
+      mensaje: "Nuevo código generado y enviado con exito. Revisa tu email",
+    });
   } catch (error) {
-    console.error(error)
-    res.status(500).json({mensaje: 'Ocurrio un error al intentar generar un nuevo código de verificación'})
+    console.error(error);
+    res.status(500).json({
+      mensaje:
+        "Ocurrio un error al intentar generar un nuevo código de verificación",
+    });
   }
-}
+};
 
-export const login = async(req, res)=>{
-  try{
-    const {email, password} = req.body
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
     //1- verficar su email
-    const usuarioBuscado = await Usuario.findOne({email});
-    if(!usuarioBuscado){
-      return res.status(401).json({mensaje: 'credenciales invalidas - validacion de email'})
+    const usuarioBuscado = await Usuario.findOne({ email });
+    if (!usuarioBuscado) {
+      return res.status(401).json({ mensaje: "credenciales invalidas" });
     }
     //2- verifiquemos el password
-    if(!(await bcrypt.compare(password, usuarioBuscado.password))){
-      return res.status(401).json({mensaje: 'credenciales invalidas - validacion de password'})
+    if (!(await bcrypt.compare(password, usuarioBuscado.password))) {
+      return res.status(401).json({ mensaje: "credenciales invalidas" });
     }
     //3- chequear si su codigo de verificación es valido
+    if (!usuarioBuscado.isVerified) {
+      return res
+        .status(403)
+        .json({ mensaje: "La cuenta no fue verificada aún" });
+    }
 
-  }catch(error){
-    console.error(error)
-    res.status(500).json({mensaje: 'Ocurrio un error al loguear al usuario'})
+    //4-generar el token jwt
+    const token = jwt.sign(
+      { id: usuarioBuscado._id, rol: usuarioBuscado.rol },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "2s",
+      },
+    );
+
+    res.cookie("token", token,{
+      httpOnly:true,
+      secure: process.env.NODE_ENV === "produccion",
+      samesite: "strict",
+      maxAge: 3600000
+    } )
+
+    res.status(200).json({
+      mensaje: "Login exitoso",
+      nombre: usuarioBuscado.nombre 
+    })
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Ocurrio un error al loguear al usuario" });
   }
-}
+};
