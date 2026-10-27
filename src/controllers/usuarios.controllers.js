@@ -204,34 +204,54 @@ export const login = async (req, res) => {
       },
     );
 
-    res.cookie("token", token,{
-      httpOnly:true,
+    res.cookie("token", token, {
+      httpOnly: true,
       secure: process.env.NODE_ENV === "produccion",
-      samesite: "strict",
-      maxAge: 3600000
-    } )
+      sameSite: "strict", //process.env.NODE_ENV === "produccion" ? 'none' : 'lax'
+      maxAge: 3600000,
+    });
 
     res.status(200).json({
       mensaje: "Login exitoso",
-      nombre: usuarioBuscado.nombre 
-    })
-
+      nombre: usuarioBuscado.nombre,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Ocurrio un error al loguear al usuario" });
   }
 };
 
-export const obtenerPerfil = async(req, res)=>{
-  try{
+export const obtenerPerfil = async (req, res) => {
+  try {
     //buscar el perfil del usuario logueado
-    const usuarioBuscado= await Usuario.findById(req.user.id).select("-password -isVerified -createdAt -updatedAt")
-    if(!usuarioBuscado){
-      return res.status(404).json({mensaje: "Usuario no encontrado"})
+    const usuarioBuscado = await Usuario.findById(req.user.id).select(
+      "-password -isVerified -createdAt -updatedAt",
+    );
+    if (!usuarioBuscado) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
-    res.status(200).json(usuarioBuscado)
-  }catch (error) {
+    res.status(200).json(usuarioBuscado);
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Ocurrio un error al obtener el perfil del usuario" });
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al obtener el perfil del usuario" });
   }
-}
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "produccion",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ mensaje: "Sesion cerrada correctamente" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ mensaje: "ocurrio un error al intentar hacer el logout" });
+  }
+};
