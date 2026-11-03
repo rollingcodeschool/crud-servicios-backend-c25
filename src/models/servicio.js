@@ -31,9 +31,9 @@ const servicioSchema = new Schema(
       },
     },
     categoria: {
-      type: String,
-      requied: true,
-      enum: ["Desarrollo Web", "Backend & API", "Consultoria"],
+      type: Schema.Types.ObjectId,
+      ref: "Categoria",
+      required: true,
     },
   },
   {

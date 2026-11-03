@@ -1,6 +1,7 @@
 import { body, param } from "express-validator";
 import resultadoValidacion from "./resultadoValidacion.js";
 import Servicio from "../models/servicio.js";
+import Categoria from "../models/categoria.js";
 
 export const reglasServicio = [
   body("nombreServicio")
@@ -44,12 +45,15 @@ export const reglasServicio = [
   body("categoria")
     .notEmpty()
     .withMessage("La categoría es un dato obligatorio")
-    .isString()
-    .withMessage("La categoría debe ser un string")
-    .isIn(["Desarrollo Web", "Backend & API", "Consultoria"])
-    .withMessage(
-      'La categoría debe ser una de las siguientes opciones: "Desarrollo Web", "Backend & API", "Consultoria"',
-    ),
+    .isMongoId()
+    .withMessage("La categoría debe ser un id válido")
+    .custom(async (valor) => {
+      const categoriaExistente = await Categoria.findById(valor);
+      if (!categoriaExistente) {
+        throw new Error("La categoría no existe en la base de datos");
+      }
+      return true;
+    }),
   body("descripcion")
     .notEmpty()
     .withMessage("La descripción es un campo obligatorio")

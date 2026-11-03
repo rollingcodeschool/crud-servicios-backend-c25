@@ -32,7 +32,10 @@ export const listarServicios = async (req, res) => {
     }
 
     const [servicios, cantidadServicios] = await Promise.all([
-      Servicio.find(query).skip(skip).limit(limit),
+      Servicio.find(query)
+        .populate("categoria", "nombre descripcion")
+        .skip(skip)
+        .limit(limit),
       Servicio.countDocuments(query),
     ]);
     // no enviar varias consultas sueltas simultaneas, es mejor armar un array con todas las preguntar a la BD
@@ -56,7 +59,10 @@ export const listarServicios = async (req, res) => {
 export const servicioBuscado = async (req, res) => {
   try {
     // console.log(req.params.id)
-    const servicio = await Servicio.findById(req.params.id);
+    const servicio = await Servicio.findById(req.params.id).populate(
+      "categoria",
+      "nombre descripcion",
+    );
     // si no encontre el servicio
     if (!servicio) {
       return res.status(404).json({ mensaje: "Servicio no encontrado" });
@@ -92,7 +98,7 @@ export const editarServicio = async (req, res) => {
       req.params.id,
       req.body,
       { new: true },
-    );
+    ).populate("categoria", "nombre descripcion");
     if (!servicioEditado) {
       return res.status(404).json({ mensaje: "El servicio no fue encontrado" });
     }
