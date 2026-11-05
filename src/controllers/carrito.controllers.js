@@ -24,6 +24,20 @@ export const obtenerCarrito = async (req, res) => {
   }
 };
 
+export const vaciarCarrito = async (req, res) => {
+  try {
+    const carrito = await buscarOCrearCarrito(req.user.id);
+    carrito.items = [];
+    await carrito.save();
+    res.status(200).json({ mensaje: "El carrito fue vaciado correctamente" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al intentar vaciar el carrito" });
+  }
+};
+
 export const agregarAlCarrito = async (req, res) => {
   try {
     const { servicioId, cantidad = 1 } = req.body;
