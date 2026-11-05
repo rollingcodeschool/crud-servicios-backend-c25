@@ -38,6 +38,40 @@ export const vaciarCarrito = async (req, res) => {
   }
 };
 
+export const eliminarDelCarrito = async (req, res) => {
+  try {
+    const { servicioId } = req.params;
+    const carrito = await Carrito.findOne({ usuario: req.user.id });
+
+    if (!carrito) {
+      return res
+        .status(404)
+        .json({ mensaje: "El carrito esta vacio" });
+    }
+
+    const indice = carrito.items.findIndex((item) =>
+      item.servicio.equals(servicioId),
+    );
+
+    if (indice === -1) {
+      return res
+        .status(404)
+        .json({ mensaje: "El servicio no se encuentra en el carrito" });
+    }
+
+    carrito.items.splice(indice, 1);
+    await carrito.save();
+    res
+      .status(200)
+      .json({ mensaje: "El servicio fue eliminado del carrito correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al intentar eliminar el servicio del carrito",
+    });
+  }
+};
+
 export const agregarAlCarrito = async (req, res) => {
   try {
     const { servicioId, cantidad = 1 } = req.body;
