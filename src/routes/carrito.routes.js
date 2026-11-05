@@ -3,6 +3,7 @@ import {
   agregarAlCarrito,
   eliminarDelCarrito,
   obtenerCarrito,
+  restarDelCarrito,
   vaciarCarrito,
 } from "../controllers/carrito.controllers.js";
 import { autenticador } from "../middleware/autenticador.js";
@@ -19,5 +20,9 @@ router
 router
   .route("/:servicioId")
   .delete([autenticador, validarServicioId], eliminarDelCarrito);
+
+router
+  .route("/:servicioId/restar")
+  .patch([autenticador, validarServicioId], restarDelCarrito);
 
 export default router;

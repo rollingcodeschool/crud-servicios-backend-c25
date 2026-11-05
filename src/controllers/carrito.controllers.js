@@ -72,6 +72,50 @@ export const eliminarDelCarrito = async (req, res) => {
   }
 };
 
+export const restarDelCarrito = async (req, res) => {
+  try {
+    const { servicioId } = req.params;
+    const carrito = await Carrito.findOne({ usuario: req.user.id });
+
+    if (!carrito) {
+      return res
+        .status(404)
+        .json({ mensaje: "El servicio no se encuentra en el carrito, el carrito esta vacio." });
+    }
+
+    const item = carrito.items.find((item) =>
+      item.servicio.equals(servicioId),
+    );
+
+    if (!item) {
+      return res
+        .status(404)
+        .json({ mensaje: "El servicio no se encuentra en el carrito" });
+    }
+
+    if (item.cantidad > 1) {
+      item.cantidad -= 1;
+      await carrito.save();
+      return res
+        .status(200)
+        .json({ mensaje: "Se resto una unidad del servicio en el carrito" });
+    }
+
+    carrito.items = carrito.items.filter(
+      (item) => !item.servicio.equals(servicioId),
+    );
+    await carrito.save();
+    res.status(200).json({
+      mensaje: "El servicio fue eliminado del carrito porque su cantidad llego a cero",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al intentar restar una unidad del carrito",
+    });
+  }
+};
+
 export const agregarAlCarrito = async (req, res) => {
   try {
     const { servicioId, cantidad = 1 } = req.body;
