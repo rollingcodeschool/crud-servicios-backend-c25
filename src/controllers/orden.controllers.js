@@ -95,9 +95,9 @@ export const crearOrdenPago = async (req, res) => {
       })),
       config: {
         online: {
-          success_url: `${process.env.CLIENT_URL}/pago/exitoso`,
-          failure_url: `${process.env.CLIENT_URL}/pago/fallido`,
-          pending_url: `${process.env.CLIENT_URL}/pago/pendiente`,
+          success_url: `${process.env.CLIENT_URL}/pago/exitoso?orden=${ordenLocal._id}`,
+          failure_url: `${process.env.CLIENT_URL}/pago/fallido?orden=${ordenLocal._id}`,
+          pending_url: `${process.env.CLIENT_URL}/pago/pendiente?orden=${ordenLocal._id}`,
           auto_return: "approved",
         },
       },
@@ -114,9 +114,18 @@ export const crearOrdenPago = async (req, res) => {
     ordenLocal.orderIdMP = respuestaMP.id;
     await ordenLocal.save();
 
-    // 9- Respondemos con la respuesta de Mercado Pago, que incluye
-    // "checkout_url" para redirigir al comprador al checkout.
-    res.status(200).json(respuestaMP);
+    // 9- Respondemos solo con lo que el front necesita: la URL del checkout
+    // y el id de la orden local (para consultar el estado al volver de MP).
+    if (!respuestaMP.checkout_url) {
+      return res.status(502).json({
+        mensaje: "Mercado Pago no devolvio la URL de checkout",
+      });
+    }
+
+    res.status(200).json({
+      ordenId: ordenLocal._id,
+      checkout_url: respuestaMP.checkout_url,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
