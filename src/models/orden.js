@@ -48,7 +48,7 @@ const ordenSchema = new Schema(
       enum: ["pendiente", "aprobado", "rechazado", "cancelado"],
       default: "pendiente",
     },
-    preferenceId: {
+    orderIdMP: {
       type: String,
     },
     paymentId: {
