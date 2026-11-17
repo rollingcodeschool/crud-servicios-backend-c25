@@ -64,9 +64,10 @@ export const reglasServicio = [
       max: 500,
     })
     .withMessage("La descripción debe contener entre 10 y 500 caracteres"),
+  // La imagen ahora puede llegar como archivo (req.file) o como URL en el body.
+  // Por eso el campo es opcional: si no viene, el controlador usa una URL por defecto.
   body("imagen")
-    .notEmpty()
-    .withMessage("La imagen es un dato obligatorio")
+    .optional({ checkFalsy: true })
     .isString()
     .withMessage("La imagen debe ser un string")
     .matches(/^https:\/\/.+\.(jpg|jpeg|png|webp|avif|svg)$/)
