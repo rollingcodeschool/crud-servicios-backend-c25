@@ -17,7 +17,13 @@ class Server {
   // metodos de la clase
   middlewares() {
     // localhost:5173 localhost:3000
-    this.app.use(cors()); //configuramos CORS para permitir la comunicacion de distintos dominios
+    // configuramos CORS con la lista de origenes permitidos (separados por coma en CORS_ORIGINS)
+    this.app.use(cors({
+      origin: process.env.CORS_ORIGINS
+        ? process.env.CORS_ORIGINS.split(",").map((o) => o.trim())
+        : ["http://localhost:5173"],
+      credentials: true, // permite que viajen las cookies en peticiones cross-site
+    }));
     this.app.use(morgan("dev")); //muestra por terminal informacion de la comunicacion HTTP
     this.app.use(express.json()); //podemos leer los datos en formato JSON que llegan en el BODY del request
     //configurar un archivo estatico

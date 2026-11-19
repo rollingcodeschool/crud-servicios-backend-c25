@@ -207,7 +207,7 @@ export const login = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "produccion",
-      sameSite: "strict", //process.env.NODE_ENV === "produccion" ? 'none' : 'lax'
+      sameSite: process.env.NODE_ENV === "produccion" ? "none" : "lax", // en dev (mismo sitio) alcanza "lax", en produccion con dominios distintos se necesita "none" + secure (HTTPS)
       maxAge: 3600000,
     });
 
@@ -244,7 +244,7 @@ export const logout = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "produccion",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "produccion" ? "none" : "lax",
     });
 
     res.status(200).json({ mensaje: "Sesion cerrada correctamente" });
